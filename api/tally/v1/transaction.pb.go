@@ -4,7 +4,7 @@
 // 	protoc        v5.29.3
 // source: api/tally/v1/transaction.proto
 
-package transactionpb
+package tally_v1
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -591,7 +591,7 @@ const file_api_tally_v1_transaction_proto_rawDesc = "" +
 	"\x06Record\x12\x17.tally.v1.RecordRequest\x1a\x15.tally.v1.Transaction\x125\n" +
 	"\x04List\x12\x15.tally.v1.ListRequest\x1a\x16.tally.v1.ListResponse\x122\n" +
 	"\x03Get\x12\x14.tally.v1.GetRequest\x1a\x15.tally.v1.Transaction\x129\n" +
-	"\x06Delete\x12\x17.tally.v1.DeleteRequest\x1a\x16.google.protobuf.EmptyB6Z4github.com/ww916/ww-tally/api/tally/v1;transactionpbb\x06proto3"
+	"\x06Delete\x12\x17.tally.v1.DeleteRequest\x1a\x16.google.protobuf.EmptyB1Z/github.com/ww916/ww-tally/api/tally/v1;tally_v1b\x06proto3"
 
 var (
 	file_api_tally_v1_transaction_proto_rawDescOnce sync.Once

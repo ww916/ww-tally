@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package tally.v1;
-option go_package = "github.com/ww916/ww-tally/api/tally/v1;transactionpb";
+option go_package = "github.com/ww916/ww-tally/api/tally/v1;tally_v1";
 
 import "google/protobuf/timestamp.proto";
 import "google/protobuf/empty.proto";

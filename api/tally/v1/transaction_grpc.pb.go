@@ -4,7 +4,7 @@
 // - protoc             v5.29.3
 // source: api/tally/v1/transaction.proto
 
-package transactionpb
+package tally_v1
 
 import (
 	context "context"
@@ -29,6 +29,9 @@ const (
 // TallyServiceClient is the client API for TallyService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
+//
+// TallyService provides APIs for managing financial transactions.
+// 账务服务：提供交易记录管理的API接口。
 type TallyServiceClient interface {
 	// Record creates a new income or expense entry.
 	// 记账：创建一条收入或支出记录。
@@ -95,6 +98,9 @@ func (c *tallyServiceClient) Delete(ctx context.Context, in *DeleteRequest, opts
 // TallyServiceServer is the server API for TallyService service.
 // All implementations must embed UnimplementedTallyServiceServer
 // for forward compatibility.
+//
+// TallyService provides APIs for managing financial transactions.
+// 账务服务：提供交易记录管理的API接口。
 type TallyServiceServer interface {
 	// Record creates a new income or expense entry.
 	// 记账：创建一条收入或支出记录。
