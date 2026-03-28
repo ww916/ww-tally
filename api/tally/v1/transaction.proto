@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+package tally.v1;
+option go_package = "github.com/ww916/ww-tally/api/tally/v1;transactionpb";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
+
+// TransactionType defines income or expense.
+// 交易类型：收入或支出
+enum TransactionType {
+  TRANSACTION_TYPE_UNSPECIFIED = 0; // 未指定 / Unspecified
+  TRANSACTION_TYPE_INCOME = 1; // 收入 / Income
+  TRANSACTION_TYPE_EXPENSE = 2; // 支出 / Expense
+}
+
+// Transaction represents a single financial record.
+// 交易记录实体（单条账目）
+message Transaction {
+  // Unique identifier, system generated (e.g., UUID).
+  // 唯一标识符，系统生成（如 UUID）。
+  string id = 1;
+
+  // Transaction type: income or expense.
+  // 交易类型：收入或支出。
+  TransactionType type = 2;
+
+  // Amount in minor units (cents for CNY), always positive.
+  // Use int64 to avoid floating point precision issues.
+  // 金额，以最小货币单位存储（人民币分）。始终为正数，使用int64避免浮点误差。
+  int64 amount = 3;
+
+  // Category name, e.g., "餐饮" (Food), "交通" (Transport), "工资" (Salary).
+  // User can input any string, no need to pre-define categories.
+  // 分类名称，例如："餐饮"、"交通"、"工资"。用户可自由输入，无需预定义分类。
+  string category = 4;
+
+  // Description or notes about this transaction.
+  // 交易描述或备注。
+  string description = 5;
+
+  // The actual transaction time (user specified), not record creation time.
+  // 实际交易时间（用户指定），非记录创建时间。
+  google.protobuf.Timestamp transaction_time = 6;
+
+  // Record creation timestamp, system generated.
+  // 记录创建时间，系统生成。
+  google.protobuf.Timestamp created_at = 7;
+}
+
+// ==================== Requests & Responses ====================
+
+// RecordRequest creates a new transaction.
+// 记账请求（创建交易记录）
+message RecordRequest {
+  // Must be INCOME or EXPENSE.
+  // 必须是收入或支出类型。
+  TransactionType type = 1;
+
+  // Amount in minor units (e.g., 12345 means ¥123.45).
+  // Must be greater than 0.
+  // 金额（最小单位，如12345表示123.45元）。必须大于0。
+  int64 amount = 2;
+
+  // Category label, required.
+  // 分类标签，必填。
+  string category = 3;
+
+  // Optional description.
+  // 可选描述。
+  string description = 4;
+
+  // Optional transaction time. If not set, uses current time.
+  // 可选交易时间，如不设置则使用当前时间。
+  google.protobuf.Timestamp transaction_time = 5;
+}
+
+// ListRequest queries transactions with filters.
+// 查账请求（列表查询，支持筛选）
+message ListRequest {
+  // Filter by transaction type. If unspecified, returns all types.
+  // 按类型筛选，如不指定则返回所有类型。
+  TransactionType filter_type = 1;
+
+  // Filter by category name (exact match). Empty means all categories.
+  // 按分类筛选（精确匹配），为空表示所有分类。
+  string filter_category = 2;
+
+  // Filter by start time (inclusive). Empty means no lower bound.
+  // 开始时间筛选（包含），为空表示不限制起始时间。
+  google.protobuf.Timestamp start_time = 3;
+
+  // Filter by end time (inclusive). Empty means no upper bound.
+  // 结束时间筛选（包含），为空表示不限制结束时间。
+  google.protobuf.Timestamp end_time = 4;
+
+  // Pagination: page number, 1-based (first page is 1).
+  // 分页页码，从1开始。
+  int32 page = 5;
+
+  // Pagination: items per page, default 20, max 100.
+  // 每页数量，默认20，最大100。
+  int32 page_size = 6;
+}
+
+// ListResponse returns transactions and pagination info.
+// 查账响应（返回列表和分页信息）
+message ListResponse {
+  // List of transactions.
+  // 交易记录列表。
+  repeated Transaction transactions = 1;
+
+  // Total count of matching records (for pagination).
+  // 符合条件的总记录数（用于分页显示）。
+  int32 total_count = 2;
+
+  // Current page number.
+  // 当前页码。
+  int32 page = 3;
+
+  // Current page size.
+  // 当前页大小。
+  int32 page_size = 4;
+}
+
+// GetRequest retrieves a single transaction by ID.
+// 单条查询请求
+message GetRequest {
+  // Transaction ID.
+  // 交易记录ID。
+  string id = 1;
+}
+
+// DeleteRequest removes a transaction.
+// 删除请求（记错了可以删）
+message DeleteRequest {
+  string id = 1;
+}
+
+// ==================== Service ====================
+
+// TallyService provides APIs for managing financial transactions.
+// 账务服务：提供交易记录管理的API接口。
+service TallyService {
+  // Record creates a new income or expense entry.
+  // 记账：创建一条收入或支出记录。
+  rpc Record(RecordRequest) returns (Transaction);
+
+  // List queries transactions with optional filters and pagination.
+  // 查账：查询交易记录列表，支持筛选和分页。
+  rpc List(ListRequest) returns (ListResponse);
+
+  // Get retrieves details of a single transaction.
+  // 查单条：获取某条记录的详情。
+  rpc Get(GetRequest) returns (Transaction);
+
+  // Delete removes a transaction permanently.
+  // 删账：永久删除一条记录（用于记错时修正）。
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty);
+}
